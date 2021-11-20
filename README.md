@@ -1,5 +1,7 @@
 # Video Gateway
 
+[![Tests](https://github.com/streamingriver/video-gateway/actions/workflows/go.yml/badge.svg)](https://github.com/streamingriver/video-gateway/actions/workflows/go.yml)
+
 ENV variables:
 
 ```
