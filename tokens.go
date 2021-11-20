@@ -13,6 +13,7 @@ func NewTokens(url string, other ...interface{}) *Tokens {
 	t := &Tokens{
 		fetchFrom: url,
 		mu:        &sync.RWMutex{},
+		workerMu:  &sync.RWMutex{},
 		maps:      &T{make(map[string]bool), make(map[string]string), make(map[string]string)},
 		work:      false,
 	}
@@ -22,6 +23,7 @@ func NewTokens(url string, other ...interface{}) *Tokens {
 type Tokens struct {
 	fetchFrom string
 	mu        *sync.RWMutex
+	workerMu  *sync.RWMutex
 	maps      *T
 	work      bool
 }
@@ -59,19 +61,26 @@ func (t Tokens) Check(token, channel string, req *http.Request) bool {
 
 // Worker periodicaly fetches tokens from api
 func (t *Tokens) Worker() {
+	t.workerMu.Lock()
+	defer t.workerMu.Unlock()
 	t.work = true
 	go t.updateTokens()
 }
 
 func (t *Tokens) StopWorker() {
+	t.workerMu.Lock()
+	defer t.workerMu.Unlock()
 	t.work = false
 }
 
 func (t *Tokens) updateTokens() {
 	for {
+		t.workerMu.RLock()
 		if !t.work {
+			t.workerMu.RUnlock()
 			break
 		}
+		t.workerMu.RUnlock()
 		t.tokens()
 		time.Sleep(2 * time.Second)
 
