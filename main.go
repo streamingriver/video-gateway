@@ -32,6 +32,7 @@ SUPER_CONFIG_PORT=:80`)
 	handlers.registry = NewRegistry()
 	handlers.tokens = tokens
 	handlers.Fetcher = NewFetcher()
+	handlers.transcoder = getenvs.GetEnvString("FFMPEG_SERVER_HOST", "video-transcoding")
 
 	router.HandleFunc("/register/backend/{name}/{host}/{port}", handlers.ping)
 

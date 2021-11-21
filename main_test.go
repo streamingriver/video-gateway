@@ -207,6 +207,62 @@ func TestHTTPMainRealFetcher(t *testing.T) {
 
 }
 
+func TestHTTPMainFailover(t *testing.T) {
+	svr := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "labas")
+	}))
+	svr.Config.Addr = "127.0.0.1:65000"
+	svr.Start()
+	defer svr.Close()
+
+	tokensServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, `
+		{"addr":{"192.168.1.1":true},"ip":{"tokenas":"192.168.1.1"},"ch":{"tokenas":"kanalas"}}
+		`)
+	}))
+	tokensServer.Start()
+	defer tokensServer.Close()
+
+	registry := NewRegistry()
+	handlers := new(HTTPHandler)
+	handlers.registry = registry
+	handlers.Fetcher = NewFetcher()
+	handlers.tokens = NewTokens(tokensServer.URL)
+	handlers.tokens.tokens()
+	handlers.transcoder = strings.ReplaceAll(svr.URL, "http://", "")
+	// requestPing(registry, strings.ReplaceAll(svr.URL, "http://", ""))
+
+	req := httptest.NewRequest(http.MethodGet, "/tokenas/kanalas/failas.ts", nil)
+	req.Header.Set("X-Real-IP", "192.168.1.1")
+	w := httptest.NewRecorder()
+
+	///{token}/{name}/{file:.*}
+	vars := map[string]string{
+		"token": "tokenas",
+		"name":  "kanalas",
+		"file":  "failas.ts",
+	}
+
+	req = mux.SetURLVars(req, vars)
+
+	req.Host = svr.URL
+
+	handlers.main(w, req)
+
+	res := w.Result()
+	defer res.Body.Close()
+
+	data, err := ioutil.ReadAll(res.Body)
+
+	if err != nil {
+		t.Errorf("expected error to be nil got %v", err)
+	}
+	if string(data) != "labas" {
+		t.Errorf("expected 'labas' response got %v", string(data))
+	}
+
+}
+
 func TestHTTPMainRealFetcherRealIpWIthHeader(t *testing.T) {
 	svr := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "labas")
