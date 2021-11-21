@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
-	"gitlab.com/avarf/getenvs"
 )
 
 type Response struct {
@@ -67,9 +66,10 @@ func (f Fetcher) Fetch(url string) *Response {
 }
 
 type HTTPHandler struct {
-	registry *Registry
-	Fetcher  IFetcher
-	tokens   *Tokens
+	registry   *Registry
+	Fetcher    IFetcher
+	tokens     *Tokens
+	transcoder string
 }
 
 func (hh *HTTPHandler) ping(w http.ResponseWriter, r *http.Request) {
@@ -88,7 +88,7 @@ func (hh HTTPHandler) main(w http.ResponseWriter, r *http.Request) {
 	url := hh.registry.getURL(vars["name"], vars["file"])
 
 	if url == nil {
-		response := hh.Fetcher.Fetch(fmt.Sprintf("http://%s/%s/%s", getenvs.GetEnvString("FFMPEG_SERVER_HOST", "video-transcoding"), vars["name"], vars["file"]))
+		response := hh.Fetcher.Fetch(fmt.Sprintf("http://%s/%s/%s", hh.transcoder, vars["name"], vars["file"]))
 
 		for k, v := range response.headers {
 			for _, vv := range v {
