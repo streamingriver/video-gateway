@@ -91,6 +91,12 @@ func (hh HTTPHandler) main(w http.ResponseWriter, r *http.Request) {
 	if url == nil {
 		response := hh.Fetcher.Fetch(fmt.Sprintf("http://%s/%s/%s", getenvs.GetEnvString("FFMPEG_SERVER_HOST", "video-transcoding"), vars["name"], vars["file"]))
 
+		for k, v := range response.headers {
+			for _, vv := range v {
+				w.Header().Set(k, vv)
+			}
+		}
+
 		w.Header().Set("Content-Lenght", fmt.Sprintf("%d", len(response.body)))
 		w.Write(response.body)
 		return

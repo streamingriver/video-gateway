@@ -293,7 +293,7 @@ func TestTokensWorker(t *testing.T) {
 	tokens := NewTokens(tokensServer.URL)
 	tokens.Worker()
 
-	time.Sleep(time.Second * 3)
+	time.Sleep(time.Second * 1)
 
 	tokens.StopWorker()
 
