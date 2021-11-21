@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -40,6 +42,14 @@ func (t Tokens) Check(token, channel string, req *http.Request) bool {
 	defer t.mu.RUnlock()
 
 	host := req.Header.Get("X-Real-IP")
+	if strings.Contains(req.Header.Get("X-Real-IP"), ":") {
+		var err error
+		host, _, err = net.SplitHostPort(req.Header.Get("X-Real-IP"))
+		if err != nil {
+			log.Printf("%v", err)
+			return false
+		}
+	}
 
 	ip, ok := t.maps.IP[token]
 	if !ok {

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -8,7 +10,18 @@ import (
 	"gitlab.com/avarf/getenvs"
 )
 
+var (
+	flagHelp = flag.Bool("h", false, "")
+)
+
 func main() {
+	flag.Parse()
+	if *flagHelp {
+		fmt.Println(`FFMPEG_SERVER_HOST=video-transcoding
+TOKENS_URL=http://sr-admin-gui/api/tokens
+SUPER_CONFIG_PORT=:80`)
+		return
+	}
 
 	tokens := NewTokens(getenvs.GetEnvString("TOKENS_URL", "http://sr-admin-gui/api/tokens"))
 	tokens.Worker()
@@ -18,6 +31,7 @@ func main() {
 	handlers := new(HTTPHandler)
 	handlers.registry = NewRegistry()
 	handlers.tokens = tokens
+	handlers.Fetcher = NewFetcher()
 
 	router.HandleFunc("/register/backend/{name}/{host}/{port}", handlers.ping)
 

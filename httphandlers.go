@@ -62,7 +62,6 @@ func (f Fetcher) Fetch(url string) *Response {
 		headers: response.Header.Clone(),
 		code:    response.StatusCode,
 	}
-	// copy(r.body, b)
 	return r
 
 }
