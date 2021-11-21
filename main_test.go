@@ -147,7 +147,7 @@ func TestHTTPMain(t *testing.T) {
 		t.Errorf("expected error to be nil got %v", err)
 	}
 	if string(data) != "response success" {
-		t.Errorf("expected empty response got %v", string(data))
+		t.Errorf("expected 'response success' response got %v", string(data))
 	}
 
 }
@@ -202,7 +202,7 @@ func TestHTTPMainRealFetcher(t *testing.T) {
 		t.Errorf("expected error to be nil got %v", err)
 	}
 	if string(data) != "labas" {
-		t.Errorf("expected empty response got %v", string(data))
+		t.Errorf("expected 'labas' response got %v", string(data))
 	}
 
 }
@@ -257,7 +257,7 @@ func TestTokenUnauthorized(t *testing.T) {
 		t.Errorf("expected error to be nil got %v", err)
 	}
 	if strings.Trim(string(data), "\n") != "Unauthorized" {
-		t.Errorf("expected empty response got %v", string(data))
+		t.Errorf("expected 'Unauthorized' response got %v", string(data))
 	}
 
 }
