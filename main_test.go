@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -413,4 +414,15 @@ func TestTokensWorker(t *testing.T) {
 	if tokens.work != false {
 		t.Errorf("worker should stopper already")
 	}
+}
+
+func TestMain(t *testing.T) {
+	os.Setenv("SUPER_CONFIG_PORT", ":9999")
+	os.Setenv("NO_OUTPUT", "true")
+	go func() {
+		time.Sleep(2 * time.Second)
+		exit <- struct{}{}
+	}()
+	main()
+
 }

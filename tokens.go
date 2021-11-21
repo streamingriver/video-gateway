@@ -114,13 +114,13 @@ func (t *Tokens) tokens() {
 func (t *Tokens) remoteGet(url string) []byte {
 	response, err := http.Get(url)
 	if err != nil {
-		log.Printf("remote_get error: %v", err)
+		// log.Printf("remote_get error: %v", err)
 		return nil
 	}
 	defer response.Body.Close()
 	b, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		log.Printf("remote_get error: %v", err)
+		// log.Printf("remote_get error: %v", err)
 		return nil
 	}
 
