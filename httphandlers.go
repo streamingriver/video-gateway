@@ -74,6 +74,9 @@ type HTTPHandler struct {
 
 func (hh *HTTPHandler) ping(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
+	if isDebug() {
+		log.Printf("got pint: %v %v %v", vars["name"], vars["host"], vars["port"])
+	}
 	hh.registry.ping(vars["name"], vars["host"], vars["port"])
 }
 
@@ -88,7 +91,11 @@ func (hh HTTPHandler) main(w http.ResponseWriter, r *http.Request) {
 	url := hh.registry.getURL(vars["name"], vars["file"])
 
 	if url == nil {
-		response := hh.Fetcher.Fetch(fmt.Sprintf("http://%s/%s/%s", hh.transcoder, vars["name"], vars["file"]))
+		urlToFetch := fmt.Sprintf("http://%s/%s/%s", hh.transcoder, vars["name"], vars["file"])
+		if isDebug() {
+			log.Printf("fetching ffmpeg backend: %v", urlToFetch)
+		}
+		response := hh.Fetcher.Fetch(urlToFetch)
 
 		for k, v := range response.headers {
 			for _, vv := range v {
@@ -102,6 +109,9 @@ func (hh HTTPHandler) main(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := hh.Fetcher.Fetch(*url)
+	if isDebug() {
+		log.Printf("fething from video cache: %v", *url)
+	}
 	if response.err != nil {
 		log.Printf("fetch url error: %v", response.err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
