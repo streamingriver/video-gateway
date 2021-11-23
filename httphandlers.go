@@ -72,17 +72,10 @@ type HTTPHandler struct {
 	transcoder string
 }
 
-func (hh *HTTPHandler) reload(w http.ResponseWriter, r *http.Request) {
-	if isDebug() {
-		log.Printf("got reload cmd")
-	}
-	hh.tokens.tokens()
-}
-
 func (hh *HTTPHandler) ping(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	if isDebug() {
-		log.Printf("got ping: %v %v %v", vars["name"], vars["host"], vars["port"])
+		log.Printf("got pint: %v %v %v", vars["name"], vars["host"], vars["port"])
 	}
 	hh.registry.ping(vars["name"], vars["host"], vars["port"])
 }
