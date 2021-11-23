@@ -448,7 +448,6 @@ func TestReloadCMD(t *testing.T) {
 	handlers.registry = registry
 	handlers.Fetcher = NewFetcher()
 	handlers.tokens = NewTokens(tokensServer.URL)
-	// handlers.tokens.tokens()
 	requestPing(registry, strings.ReplaceAll(svr.URL, "http://", ""))
 
 	req := httptest.NewRequest(http.MethodGet, "/tokenas/kanalas/failas.ts", nil)
